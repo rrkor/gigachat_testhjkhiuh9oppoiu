@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from gigachat import GigaChat
 from gigachat.models import Messages, MessagesRole, Chat
 
-from products import products
+# from products import products
 from random import randint
 
 from synergy import synergy
@@ -37,6 +37,10 @@ sys_prompt_summary = """
 
 Сохрани стиль и структуру из данного примера
 """
+import json
+with open("output.json", "r", encoding='utf-8') as file:
+	products = json.load(file)
+
 
 prod = []
 relevant_products = []
@@ -46,7 +50,7 @@ print(prod)
 
 for j in prod:
 	relevant_products.append(products[j] + synergy[j])
-	print(f"{products[j]}\n\n{synergy[j]}")
+	print(f"{products[j]}")
 
 giga = GigaChat(
 	credentials=giga_auth,
