@@ -1,10 +1,10 @@
 import os
 from gigachat import GigaChat
 from gigachat.models import Chat, Messages, MessagesRole
-
 from new_prompt import sys_prompt, advantages, clients, politeness
+from synergy import synergy
 from dotenv import load_dotenv
-
+import random
 load_dotenv()
 giga_auth = os.getenv("GIGACHAT_AUTH")
 
@@ -12,12 +12,18 @@ total_prompt_tokens = 0
 total_completion_tokens = 0
 total_tokens = 0
 
-print(f"""Выберите продукт
+'''print(f"""Выберите продукт
         1 - СберЗдоровье
         2 - ПДС
         3 - ЗЛС
-        4 - СберПрайм (ДОПИСАТЬ)
+        4 - СберПрайм
         5 - Кредитная карта
+        6 - Перевод ЗП
+        7 - Детская СберКарта
+        8 - СберВклад
+        9 - СберМобайл
+        10 - Накопительный счет
+        11 - Перевод пенсии
 Введите номер: """)
 j = int(input())
 
@@ -47,7 +53,8 @@ payload = Chat(
 	messages=messages,
 	model='GigaChat-2-Max',
 	temperature=0,
-	top_p=0.1
+	top_p=0.1,
+	profanity_check=False
 )
 response = giga.chat(payload)
 response_content_1 = response.choices[0].message.content.strip('```')
@@ -63,6 +70,35 @@ print(f"\nТокены на этапе 1:")
 print(f"  Токены на запрос (prompt_tokens): {stage1_prompt_tokens}")
 print(f"  Токены на ответ (completion_tokens): {stage1_completion_tokens}")
 print(f"  Общее количество токенов (total_tokens): {stage1_total_tokens}")
+'''
+
+giga = GigaChat(
+	credentials=giga_auth,
+	scope="GIGACHAT_API_B2B",
+	verify_ssl_certs=False
+)
+sdf = ""
+for prod in advantages:
+	messages = [
+		Messages(role=MessagesRole.SYSTEM, content=f"{sys_prompt}\n\nИспользуй такой стиль общения:\n{politeness}"),
+		Messages(role=MessagesRole.USER, content=f"{prod}\n\n{clients[0]}")
+	]
+	payload = Chat(
+		messages=messages,
+		model='GigaChat-2-Max',
+		temperature=0,
+		top_p=0.1,
+		profanity_check=False
+	)
+	response = giga.chat(payload)
+	response_content_1 = response.choices[0].message.content.strip('```')
+	sdf += (response_content_1 + "\n\n")
+	print(response_content_1)
+
+with open("output.txt", "w", encoding="utf-8") as f:
+	f.write(sdf)
+
+
 
 '''print(f"\n\nЭтап 2: ai-sale-speaker")
 messages = [
